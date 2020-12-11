@@ -1,2 +1,9 @@
 node_modules
 keys.js
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+*.code-workspace
+.eslintcache
