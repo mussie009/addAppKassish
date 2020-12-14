@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 
 // Components
-import FileUpload from './components/FileUpload';
+import ArrivalEstimation from './components/ArrivalEstimation';
 
 const App = () => {
   return (
@@ -11,7 +11,7 @@ const App = () => {
       <a href="/login">Logg inn med Micosoft konto</a>
         <img src={logo} className="App-logo" alt="logo" />
         
-        <FileUpload />
+        <ArrivalEstimation />
         
       </header>
     </div>
