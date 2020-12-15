@@ -1,47 +1,35 @@
-import React from "react";
-import XLSX from "xlsx";
-import EstimateButton from "./EstimateButton";
-import FileSelector from "./FileSelector";
+import React from 'react';
+import EstimateButton from './EstimateButton';
+import FileSelector from './FileSelector';
 import etaService from '../services/eta.service';
+import { parseWorkbook, generateWorkbook } from '../utils/xlsxHelper';
 
 class ArrivalEstimation extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      data: [],
+      fileName: '',
+      input: []
     };
 
     this.selectFile = this.selectFile.bind(this);
-    this.estimateEta = this.estimateEta.bind(this);
+    this.estimate = this.estimate.bind(this);
   }
 
   selectFile(file) {
+    this.setState({ fileName: file.name });
+
     const reader = new FileReader();
     const rABS = !!reader.readAsBinaryString;
 
     reader.onload = (e) => {
       // Parse data
       const bstr = e.target.result;
-      const wb = XLSX.read(bstr, { type: rABS ? "binary" : "array" });
-
-      // Get the first worksheet
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-
-      // Convert to JSON and map to valid property name
-      const data = XLSX.utils.sheet_to_json(ws).map((record) => {
-        return {
-          to_postal_code: record["Sendt til postnummer"],
-          from_postal_code: record["Sendt fra postnummer"],
-          send_date: new Date().toISOString().slice(0, 10),
-        };
-      });
+      const data = parseWorkbook(bstr, rABS ? "binary" : "array");
 
       // Update state
-      this.setState({ data: data });
-
-      console.log(this.state.data); // Test
+      this.setState({ input: data });
     };
 
     if (rABS) {
@@ -51,9 +39,10 @@ class ArrivalEstimation extends React.Component {
     }
   }
 
-  estimateEta() {
-    etaService.getEta(this.state.data).then((response) => {
-      console.log(response);
+  estimate() {
+    etaService.getEta(this.state.input).then((response) => {
+      // Download new workbook with estimates
+      generateWorkbook(response.data, this.state.fileName);
     }).catch((error) => {
       console.error(error);
     });
@@ -63,7 +52,7 @@ class ArrivalEstimation extends React.Component {
     return (
       <div>
         <FileSelector selectFile={this.selectFile} />
-        <EstimateButton estimateEta={this.estimateEta} />
+        <EstimateButton estimate={this.estimate} />
       </div>
     );
   }

@@ -1,16 +1,8 @@
 import axios from 'axios';
-
-const API_TOKEN = process.env.REACT_APP_API_TOKEN;
-const API_URL = process.env.REACT_APP_API_URL;
+import { API_URL } from '../configs/env';
 
 const getEta = (data) => {
-    return axios.post(API_URL, { data: data }, {
-        headers: {
-            'Authorization': `Bearer ${API_TOKEN}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    });
+    return axios.post(API_URL, { data: data });
 };
 
 const etaService = {

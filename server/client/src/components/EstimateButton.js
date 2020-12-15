@@ -7,14 +7,14 @@ class EstimateButton extends React.Component {
   }
 
   handleOnClick() {
-    this.props.estimateEta();
+    this.props.estimate();
   }
 
   render() {
     return (
       <div>
         <button onClick={this.handleOnClick}>
-          Beregn
+          Estimer
         </button>
       </div>
     );
