@@ -27,7 +27,7 @@ export const generateWorkbook = (data, fileName) => {
 
   // Create filename
   const i = fileName.lastIndexOf(".");
-  const now = new Date().toISOString().slice(0, 10);
+  const now = new Date().toLocaleDateString('no-NO').replaceAll(".", "-");
   fileName = `${fileName.substr(0, i)}-ESTIMAT-${now}.xlsx`;
 
   XLSX.writeFile(newWB, fileName);
