@@ -1,16 +1,17 @@
-import React from 'react';
-import EstimateButton from './EstimateButton';
-import FileSelector from './FileSelector';
-import etaService from '../services/eta.service';
-import { parseWorkbook, generateWorkbook } from '../utils/xlsxHelper';
+import React from "react";
+import EstimateButton from "./EstimateButton";
+import FileSelector from "./FileSelector";
+import etaService from "../services/eta.service";
+import { readAndParse, writeAndDownload } from "../utils/xlsxHelper";
+import { toInput, toOutput } from '../utils/mapData';
 
 class ArrivalEstimation extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      fileName: '',
-      input: []
+      fileName: "",
+      data: [],
     };
 
     this.selectFile = this.selectFile.bind(this);
@@ -20,33 +21,25 @@ class ArrivalEstimation extends React.Component {
   selectFile(file) {
     this.setState({ fileName: file.name });
 
-    const reader = new FileReader();
-    const rABS = !!reader.readAsBinaryString;
+    const data = readAndParse(file);
 
-    reader.onload = (e) => {
-      // Parse data
-      const bstr = e.target.result;
-      const data = parseWorkbook(bstr, rABS ? "binary" : "array");
-
-      // Update state
-      this.setState({ input: data });
-    };
-
-    if (rABS) {
-      reader.readAsBinaryString(file);
-    } else {
-      reader.readAsArrayBuffer(file);
-    }
+    this.setState({ data: data });
   }
 
   estimate() {
-    etaService.getEta(this.state.input).then((response) => {
-      // Download new workbook with estimates
-      generateWorkbook(response.data, this.state.fileName);
-    }).catch((error) => {
-      console.error(error);
-    });
-  };
+    const input = toInput(this.state.data);
+
+    etaService
+      .getEta(input)
+      .then((response) => {
+        const output = toOutput(this.state.data, response.data);
+
+        writeAndDownload(output, this.state.fileName);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   render() {
     return (
