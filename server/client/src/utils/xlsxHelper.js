@@ -1,74 +1,55 @@
 import XLSX from "xlsx";
-import { from_postal_code, to_postal_code, send_date } from "./headersIn";
-import { from, to, sent, arrival, window, confidence } from "./headersOut";
+import { parseFromISO } from './dateParser';
 
 /**
- * Reads the workbook and parses to objects for the Posten API
+ * Reads and parses the provided file
+ * TODO: Validation and error handling
  */
-export const parseWorkbook = (binaryString, type) => {
-  const wb = XLSX.read(binaryString, { type, cellDates: true });
+export const readAndParse = (file) => {
+  const data = [];
 
-  // Get the first worksheet
-  const wsname = wb.SheetNames[0];
-  const ws = wb.Sheets[wsname];
+  const reader = new FileReader();
+  const rABS = !!reader.readAsBinaryString;
 
-  // Convert to JSON and map to valid property name
-  const data = XLSX.utils.sheet_to_json(ws).map((record) => {
-    // Format date to YYYY-MM-DD
-    const dateISO = parseToISO(record[send_date]);
+  reader.onload = (e) => {
+    // Parse data
+    const bstr = e.target.result;
 
-    return {
-      from_postal_code: record[from_postal_code],
-      to_postal_code: record[to_postal_code],
-      send_date: dateISO,
-    };
-  });
+    const wb = XLSX.read(bstr, {
+      type: rABS ? "binary" : "array",
+      cellDates: true,
+    });
+
+    // Get the first worksheet
+    const wsname = wb.SheetNames[0];
+    const ws = wb.Sheets[wsname];
+
+    XLSX.utils.sheet_to_json(ws, { defval: "" }).forEach((row) => {
+        data.push(row);
+    });
+  };
+
+  if (rABS) {
+    reader.readAsBinaryString(file);
+  } else {
+    reader.readAsArrayBuffer(file);
+  }
 
   return data;
 };
 
 /**
- * Creates a new workbook (xlsx-file) with new data
+ * Writes the old and new data to a new xlsx-file
  */
-export const generateWorkbook = (data, fileName) => {
-  const newBook = XLSX.utils.book_new();
+export const writeAndDownload = (data, fileName) => {
+    const newBook = XLSX.utils.book_new();
+    const newSheet = XLSX.utils.json_to_sheet(data, { cellDates: true, dateNF: "dd.MM.yyyy" });
 
-  // Customize column header names and order
-  const formatted = data.map((rec) => {
-    return {
-      [from]: rec.from_postal_code,
-      [to]: rec.to_postal_code,
-      [sent]: parseFromISO(new Date(rec.send_date)),
-      [arrival]: parseFromISO(new Date(rec.date)),
-      [window]: `${rec.start}-${rec.end}`,
-      [confidence]: rec.confidence,
-    };
-  });
+    XLSX.utils.book_append_sheet(newBook, newSheet, "Estimater");
 
-  const newSheet = XLSX.utils.json_to_sheet(formatted);
-  XLSX.utils.book_append_sheet(newBook, newSheet, "Estimater");
-
-  // Writing the file will cause an automatic download
-  XLSX.writeFile(newBook, getFileName(fileName));
-};
-
-/**
- * Parses from DD-MM-YYYY to YYYY-MM-DD
- */ 
-const parseToISO = (date) => {
-  return (
-    date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
-  );
-};
-
-/**
- * Parses from YYYY-MM-DD to DD-MM-YYYY
- */
-const parseFromISO = (date) => {
-  return (
-    date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear()
-  );
-};
+    // Writing the file will cause an automatic download
+    XLSX.writeFile(newBook, getFileName(fileName));
+}
 
 /**
  * Creates a new recognizable name
