@@ -1,3 +1,4 @@
+// Supported file types for upload
 export default [
     "xlsx",
     "xlsb",
