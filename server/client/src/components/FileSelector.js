@@ -15,8 +15,11 @@ class FileSelector extends React.Component {
 
     render() {
         return (
-            <div>
-                <input type="file" accept={supportedTypes} onChange={this.handleChange} />
+            <div className="mt-5">
+                <label for="file-upload" className="custom-button">
+                    Velg en fil for å laste opp
+                </label>
+                <input id="file-upload" type="file" accept={supportedTypes} onChange={this.handleChange} />
             </div>
         )
     }

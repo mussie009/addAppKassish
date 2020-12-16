@@ -53,6 +53,33 @@ passport.use(new AzureAdStrategy({
 
 }, (iss, sub, profile, accessToken, refreshToken, done) => {
    // console.log(iss, sub, profile, accessToken, refreshToken);
+
+
+
+   if ( iss ) {
+    console.log( 'iss' + JSON.stringify( iss ) );
+  }
+
+  if ( sub ) {
+    console.log( 'sub' + JSON.stringify( sub ) );
+  }
+
+  if ( accessToken ) {
+    console.log( 'Received accessToken ' + accessToken );
+  }
+
+  if ( refreshToken ) {
+    console.log( 'Received refreshToken ' + refreshToken );
+  }
+  if ( !profile.oid ) {
+    console.log( 'Received accessToken ' + accessToken );
+    return done( new Error( "No oid found" ), null );
+  }
+
+  if ( profile ) {
+    console.log( 'profile' + JSON.stringify( profile ) );
+  }
+  
     if (!profile.oid) {
         return done(new Error("No oid found"), null);
       }

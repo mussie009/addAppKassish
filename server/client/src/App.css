@@ -25,7 +25,7 @@
 }
 
 .App-link {
-  color: #61dafb;
+  color:#0b0b0b;
 }
 
 @keyframes App-logo-spin {
@@ -35,4 +35,40 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.bg-color-jt {
+  background-color: #002F19;
+}
+.container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.jumbotron {
+  min-height: 650px;
+}
+.container {
+  padding-top: 130px;
+}
+input[type="file"] {
+  display: none;
+}
+.custom-button {
+  border: 1px solid #7BC144;
+  display: inline-block;
+  padding: 12px 20px 12px 20px;
+  cursor: pointer;
+  border-radius: 3px;
+  background-color: #7BC144;
+  color: #0b0b0b;
+  font-weight: bold;
+  font-size: 20px;
+}
+.custom-button:hover {
+  background-color:	#75b148
+}
+@font-face {
+  font-family: postenFont;
+  src: url('PostenSans-Regular.ttf')  format('truetype');
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import '../App.css';
 import EstimateButton from "./EstimateButton";
 import FileSelector from "./FileSelector";
 import etaService from "../services/eta.service";
@@ -43,10 +44,18 @@ class ArrivalEstimation extends React.Component {
 
   render() {
     return (
-      <div>
-        <FileSelector selectFile={this.selectFile} />
-        <EstimateButton estimate={this.estimate} />
+
+      <div className="jumbotron jumbotron-fluid bg-color-jt mt-4">
+          <div className="container">
+              <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
+              <p className="lead text-white ">Med fokus på salgsverktøy.</p>
+              <FileSelector selectFile={this.selectFile} />
+              <EstimateButton estimate={this.estimate} />
+             </div>
       </div>
+
+      
+      
     );
   }
 }
