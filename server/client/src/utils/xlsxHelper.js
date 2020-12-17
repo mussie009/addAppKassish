@@ -1,5 +1,5 @@
 import XLSX from "xlsx";
-import { validateHeaders, validateTypes } from './validator';
+import { validateHeaders, validateData } from './validator';
 import { parseFromISO } from './dateParser';
 
 /**
@@ -29,26 +29,25 @@ export const readAndParse =  (file) => {
   
       const headers = getHeaders(ws);
 
-      const missingHeaders = validateHeaders(headers);
-      if (missingHeaders.length !== 0) {
+      const headerErrors = validateHeaders(headers);
+      if (headerErrors.length !== 0) {
         reject({
-          missingHeaders
+          type: "headers",
+          data: headerErrors
         });
       }
   
       const data = XLSX.utils.sheet_to_json(ws, { defval: "" });
 
-      const typeErrors = validateTypes(data);
-      if (typeErrors.length !== 0) {
+      const dataErrors = validateData(data);
+      if (dataErrors.length !== 0) {
         reject({
-          typeErrors
+          type: "data",
+          data: dataErrors
         });
       }
 
-      resolve({
-        headers,
-        data
-      });
+      resolve(data);
     };
   
     if (rABS) {

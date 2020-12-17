@@ -4,7 +4,7 @@ import EstimateButton from "./EstimateButton";
 import FileSelector from "./FileSelector";
 import etaService from "../services/eta.service";
 import { readAndParse, writeAndDownload } from "../utils/xlsxHelper";
-import { toInput, toOutput } from "../utils/mapData";
+import { toInput, toOutput } from "../utils/converter";
 
 class ArrivalEstimation extends React.Component {
   constructor(props) {
@@ -12,8 +12,9 @@ class ArrivalEstimation extends React.Component {
 
     this.state = {
       fileName: "",
-      headers: [],
       data: [],
+      headerErrors: [],
+      dataErrors: [],
       canEstimate: false,
     };
 
@@ -26,11 +27,18 @@ class ArrivalEstimation extends React.Component {
 
     readAndParse(file)
       .then((res) => {
-        console.log(res);
-        this.setState({ data: res.data });
+        this.setState({ data: res, canEstimate: true });
       })
       .catch((err) => {
-        console.log(err);
+        if (err.type === "headers") {
+          this.setState({ headerErrors: err.data });
+          console.log(this.state.headerErrors);
+        }
+
+        if (err.type === "data") {
+          this.setState({ dataErrors: err.data });
+          console.log(this.state.dataErrors);
+        }
       });
   }
 

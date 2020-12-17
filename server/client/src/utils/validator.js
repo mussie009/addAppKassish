@@ -1,6 +1,6 @@
 import { from_postal_code, to_postal_code, send_date } from './headersInput';
 
-export const validateTypes = (data) => {
+export const validateData = (data) => {
     const errors = [];
 
     data.forEach((item) => {
@@ -9,8 +9,7 @@ export const validateTypes = (data) => {
             fields: []
         };
 
-        if (!isString(typeof item[from_postal_code])) {
-            console.log(item[from_postal_code]);
+        if (!isString(item[from_postal_code])) {
             err.fields.push(from_postal_code);
         }
         if (!isString(item[to_postal_code])) {
@@ -45,5 +44,5 @@ export const validateHeaders = (headers) => {
 }
 
 const isString = (value) => {
-    return typeof(value) === 'string' || value instanceof String;
+    return typeof(value) === 'string';
 }
