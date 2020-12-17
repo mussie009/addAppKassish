@@ -1,10 +1,10 @@
 import React from "react";
-import '../App.css';
+import "../App.css";
 import EstimateButton from "./EstimateButton";
 import FileSelector from "./FileSelector";
 import etaService from "../services/eta.service";
 import { readAndParse, writeAndDownload } from "../utils/xlsxHelper";
-import { toInput, toOutput } from '../utils/mapData';
+import { toInput, toOutput } from "../utils/converter";
 
 class ArrivalEstimation extends React.Component {
   constructor(props) {
@@ -13,6 +13,9 @@ class ArrivalEstimation extends React.Component {
     this.state = {
       fileName: "",
       data: [],
+      headerErrors: [],
+      dataErrors: [],
+      canEstimate: false,
     };
 
     this.selectFile = this.selectFile.bind(this);
@@ -22,9 +25,18 @@ class ArrivalEstimation extends React.Component {
   selectFile(file) {
     this.setState({ fileName: file.name });
 
-    const data = readAndParse(file);
-
-    this.setState({ data: data });
+    readAndParse(file)
+      .then((res) => {
+        this.setState({ data: res, canEstimate: true });
+      })
+      .catch((err) => {
+        if (err.type === "headers") {
+          this.setState({ headerErrors: err.data });
+        }
+        if (err.type === "data") {
+          this.setState({ dataErrors: err.data });
+        }
+      });
   }
 
   estimate() {
@@ -44,18 +56,14 @@ class ArrivalEstimation extends React.Component {
 
   render() {
     return (
-
       <div className="jumbotron jumbotron-fluid bg-color-jt mt-4">
-          <div className="container">
-              <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
-              <p className="lead text-white ">Med fokus på salgsverktøy.</p>
-              <FileSelector selectFile={this.selectFile} />
-              <EstimateButton estimate={this.estimate} />
-             </div>
+        <div className="container">
+          <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
+          <p className="lead text-white ">Med fokus på salgsverktøy.</p>
+          <FileSelector selectFile={this.selectFile} />
+          <EstimateButton estimate={this.estimate} />
+        </div>
       </div>
-
-      
-      
     );
   }
 }
