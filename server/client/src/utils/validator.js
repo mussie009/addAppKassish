@@ -1,25 +1,37 @@
 import { from_postal_code, to_postal_code, send_date } from './headersInput';
 
+/**
+ * Iterates every value (cell) and checks if columns contain invalid data
+ */
 export const validateData = (data) => {
     const errors = [];
+    let from_containsInvalidData = false;
+    let to_containsInvalidData = false;
+    let date_containsInvalidData = false;
 
     data.forEach((item) => {
-        const row = (2 + data.indexOf(item));
 
         if (!isString(item[from_postal_code])) {
-            errors.push(stringError(row, from_postal_code, item[from_postal_code]));
+            from_containsInvalidData = true;
         }
         if (!isString(item[to_postal_code])) {
-            errors.push(stringError(row, to_postal_code, item[to_postal_code]));
+            to_containsInvalidData = true;
         }
         if (!(item[send_date] instanceof Date)) {
-            errors.push(dateError(row, send_date, item[send_date]));
+            date_containsInvalidData = true;
         }
     });
+
+    if (from_containsInvalidData) errors.push(from_postal_code);
+    if (to_containsInvalidData) errors.push(to_postal_code);
+    if (date_containsInvalidData) errors.push(send_date);
 
     return errors;
 }
 
+/**
+ * Checks if the necessary headers are present in the given headers
+ */
 export const validateHeaders = (headers) => {
     const errors = [];
 
@@ -38,20 +50,4 @@ export const validateHeaders = (headers) => {
 
 const isString = (value) => {
     return typeof(value) === 'string';
-}
-
-const stringError = (row, column, value) => {
-    return {
-        row,
-        column,
-        message: `${value} er ikke en gyldig tekststreng`
-    }
-}
-
-const dateError = (row, column, value) => {
-    return {
-        row,
-        column,
-        message: `${value} er ikke en gyldig dato`
-    }
 }

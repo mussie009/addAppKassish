@@ -28,13 +28,16 @@ class ArrivalEstimation extends React.Component {
     readAndParse(file)
       .then((res) => {
         this.setState({ data: res, canEstimate: true });
+        console.log("Data", this.state.data);
       })
       .catch((err) => {
         if (err.type === "headers") {
           this.setState({ headerErrors: err.data });
+          console.log("Header errors", this.state.headerErrors);
         }
         if (err.type === "data") {
           this.setState({ dataErrors: err.data });
+          console.log("Data errors", this.state.dataErrors);
         }
       });
   }
