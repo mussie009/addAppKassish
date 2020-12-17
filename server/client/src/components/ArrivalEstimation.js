@@ -61,10 +61,7 @@ class ArrivalEstimation extends React.Component {
           <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
           <p className="lead text-white ">Med fokus på salgsverktøy.</p>
           <FileSelector selectFile={this.selectFile} />
-          <EstimateButton
-            canEstimate={this.state.canEstimate}
-            estimate={this.estimate}
-          />
+          <EstimateButton estimate={this.estimate} />
         </div>
       </div>
     );
