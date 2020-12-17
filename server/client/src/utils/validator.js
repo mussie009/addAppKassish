@@ -4,23 +4,16 @@ export const validateData = (data) => {
     const errors = [];
 
     data.forEach((item) => {
-        const err = {
-            row: (2 + data.indexOf(item)),
-            fields: []
-        };
+        const row = (2 + data.indexOf(item));
 
         if (!isString(item[from_postal_code])) {
-            err.fields.push(from_postal_code);
+            errors.push(stringError(row, from_postal_code, item[from_postal_code]));
         }
         if (!isString(item[to_postal_code])) {
-            err.fields.push(to_postal_code);
+            errors.push(stringError(row, to_postal_code, item[to_postal_code]));
         }
         if (!(item[send_date] instanceof Date)) {
-            err.fields.push(send_date);
-        }
-
-        if (err.fields.length !== 0) {
-            errors.push(err);
+            errors.push(dateError(row, send_date, item[send_date]));
         }
     });
 
@@ -45,4 +38,20 @@ export const validateHeaders = (headers) => {
 
 const isString = (value) => {
     return typeof(value) === 'string';
+}
+
+const stringError = (row, column, value) => {
+    return {
+        row,
+        column,
+        message: `${value} er ikke en gyldig tekststreng`
+    }
+}
+
+const dateError = (row, column, value) => {
+    return {
+        row,
+        column,
+        message: `${value} er ikke en gyldig dato`
+    }
 }

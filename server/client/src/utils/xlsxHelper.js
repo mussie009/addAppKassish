@@ -4,7 +4,6 @@ import { parseFromISO } from './dateParser';
 
 /**
  * Reads and parses the provided file
- * TODO: Validation and error handling
  */
 export const readAndParse =  (file) => {
 
@@ -29,6 +28,7 @@ export const readAndParse =  (file) => {
   
       const headers = getHeaders(ws);
 
+      // Returns as error
       const headerErrors = validateHeaders(headers);
       if (headerErrors.length !== 0) {
         reject({
@@ -39,6 +39,7 @@ export const readAndParse =  (file) => {
   
       const data = XLSX.utils.sheet_to_json(ws, { defval: "" });
 
+      // Returns as error
       const dataErrors = validateData(data);
       if (dataErrors.length !== 0) {
         reject({
@@ -47,6 +48,7 @@ export const readAndParse =  (file) => {
         });
       }
 
+      // Returns successfully
       resolve(data);
     };
   

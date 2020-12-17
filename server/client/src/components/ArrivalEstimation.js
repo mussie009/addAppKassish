@@ -32,12 +32,9 @@ class ArrivalEstimation extends React.Component {
       .catch((err) => {
         if (err.type === "headers") {
           this.setState({ headerErrors: err.data });
-          console.log(this.state.headerErrors);
         }
-
         if (err.type === "data") {
           this.setState({ dataErrors: err.data });
-          console.log(this.state.dataErrors);
         }
       });
   }
