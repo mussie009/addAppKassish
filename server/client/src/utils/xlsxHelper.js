@@ -1,41 +1,62 @@
 import XLSX from "xlsx";
+import { validateHeaders, validateTypes } from './validator';
 import { parseFromISO } from './dateParser';
 
 /**
  * Reads and parses the provided file
  * TODO: Validation and error handling
  */
-export const readAndParse = (file) => {
-  const data = [];
+export const readAndParse =  (file) => {
 
-  const reader = new FileReader();
-  const rABS = !!reader.readAsBinaryString;
+  // Using promise because headers and data array is not populating synchronizable
+  return new Promise((resolve, reject) => {
+  
+    const reader = new FileReader();
+    const rABS = !!reader.readAsBinaryString;
+  
+    reader.onload = (e) => {
+      // Parse data
+      const bstr = e.target.result;
+  
+      const wb = XLSX.read(bstr, {
+        type: rABS ? "binary" : "array",
+        cellDates: true,
+      });
+  
+      // Get the first worksheet
+      const wsname = wb.SheetNames[0];
+      const ws = wb.Sheets[wsname];
+  
+      const headers = getHeaders(ws);
 
-  reader.onload = (e) => {
-    // Parse data
-    const bstr = e.target.result;
+      const missingHeaders = validateHeaders(headers);
+      if (missingHeaders.length !== 0) {
+        reject({
+          missingHeaders
+        });
+      }
+  
+      const data = XLSX.utils.sheet_to_json(ws, { defval: "" });
 
-    const wb = XLSX.read(bstr, {
-      type: rABS ? "binary" : "array",
-      cellDates: true,
-    });
+      const typeErrors = validateTypes(data);
+      if (typeErrors.length !== 0) {
+        reject({
+          typeErrors
+        });
+      }
 
-    // Get the first worksheet
-    const wsname = wb.SheetNames[0];
-    const ws = wb.Sheets[wsname];
-
-    XLSX.utils.sheet_to_json(ws, { defval: "" }).forEach((row) => {
-        data.push(row);
-    });
-  };
-
-  if (rABS) {
-    reader.readAsBinaryString(file);
-  } else {
-    reader.readAsArrayBuffer(file);
-  }
-
-  return data;
+      resolve({
+        headers,
+        data
+      });
+    };
+  
+    if (rABS) {
+      reader.readAsBinaryString(file);
+    } else {
+      reader.readAsArrayBuffer(file);
+    }
+  });
 };
 
 /**
@@ -49,6 +70,26 @@ export const writeAndDownload = (data, fileName) => {
 
     // Writing the file will cause an automatic download
     XLSX.writeFile(newBook, getFileName(fileName));
+}
+
+/**
+ * Extracts only the headers from the file
+ * (to be used for checking if necessary columns are present)
+ */
+const getHeaders = (sheet) => {
+  const headers = [];
+  const range = XLSX.utils.decode_range(sheet['!ref']);
+  let C, R = range.s.r;
+
+  for (C = range.s.c; C <= range.e.c; ++C) {
+    const cell = sheet[XLSX.utils.encode_cell({c: C, r: R})];
+
+    if (cell && cell.t) {
+      headers.push(XLSX.utils.format_cell(cell));
+    }
+  }
+  
+  return headers;
 }
 
 /**

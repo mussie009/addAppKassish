@@ -14,7 +14,7 @@ class EstimateButton extends React.Component {
   render() {
     return (
       <div>
-        <button className="custom-button" onClick={this.handleOnClick}>
+        <button disabled={!this.props.canEstimate} className="custom-button" onClick={this.handleOnClick}>
         <i className="fa fa-download mr-3"></i>
           Lastned
         </button>
