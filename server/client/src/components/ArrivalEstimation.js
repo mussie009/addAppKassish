@@ -2,9 +2,12 @@ import React from "react";
 import "../App.css";
 import EstimateButton from "./EstimateButton";
 import FileSelector from "./FileSelector";
+import ValidationDisplay from "./ValidationDisplay";
 import etaService from "../services/eta.service";
 import { readAndParse, writeAndDownload } from "../utils/xlsxHelper";
 import { toInput, toOutput } from "../utils/converter";
+import Instructions from "./Instructions";
+import ServerErrorDisplay from "./ServerErrorDisplay";
 
 class ArrivalEstimation extends React.Component {
   constructor(props) {
@@ -13,8 +16,9 @@ class ArrivalEstimation extends React.Component {
     this.state = {
       fileName: "",
       data: [],
-      headerErrors: [],
-      dataErrors: [],
+      validation: {},
+      serverError: {},
+      loading: false,
       canEstimate: false,
     };
 
@@ -22,23 +26,25 @@ class ArrivalEstimation extends React.Component {
     this.estimate = this.estimate.bind(this);
   }
 
+  resetState() {
+    this.setState({
+      data: [],
+      validation: {},
+      serverError: {},
+      canEstimate: false,
+    });
+  }
+
   selectFile(file) {
-    this.setState({ fileName: file.name });
+    this.resetState();
+    this.setState({ loading: true, fileName: file.name });
 
     readAndParse(file)
       .then((res) => {
-        this.setState({ data: res, canEstimate: true });
-        console.log("Data", this.state.data);
+        this.setState({ data: res, canEstimate: true, loading: false });
       })
       .catch((err) => {
-        if (err.type === "headers") {
-          this.setState({ headerErrors: err.data });
-          console.log("Header errors", this.state.headerErrors);
-        }
-        if (err.type === "data") {
-          this.setState({ dataErrors: err.data });
-          console.log("Data errors", this.state.dataErrors);
-        }
+        this.setState({ validation: err, loading: false });
       });
   }
 
@@ -53,19 +59,39 @@ class ArrivalEstimation extends React.Component {
         writeAndDownload(output, this.state.fileName);
       })
       .catch((error) => {
-        console.error(error);
+        this.setState({
+          canEstimate: false,
+          serverError: {
+            status: error.response.status,
+            data: error.response.data,
+          },
+        });
       });
   }
 
   render() {
     return (
-      <div className="jumbotron jumbotron-fluid bg-color-jt mt-4">
-        <div className="container">
-          <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
-          <p className="lead text-white ">Med fokus på salgsverktøy.</p>
-          <FileSelector selectFile={this.selectFile} />
-          <EstimateButton estimate={this.estimate} />
+      <div>
+        <div className="jumbotron jumbotron-fluid bg-color-jt mt-4">
+          <div className="container">
+            <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
+            <p className="lead text-white ">Med fokus på salgsverktøy.</p>
+            <FileSelector selectFile={this.selectFile} />
+            {this.state.loading && (
+              <p className="text-white">Validerer {this.state.fileName}...</p>
+            )}
+            <ValidationDisplay
+              fileName={this.state.fileName}
+              validation={this.state.validation}
+            />
+            {this.state.loading && <p>Validerer fil...</p>}
+            {this.state.canEstimate && (
+              <EstimateButton estimate={this.estimate} />
+            )}
+            <ServerErrorDisplay error={this.state.serverError}/>
+          </div>
         </div>
+        <Instructions/>
       </div>
     );
   }
