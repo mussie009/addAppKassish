@@ -69,8 +69,6 @@ class ArrivalEstimation extends React.Component {
             data: error.response.data,
           },
         });
-
-        console.log(this.state.serverError);
       });
   }
 

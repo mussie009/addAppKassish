@@ -1,9 +1,6 @@
 import React from "react";
 
 class ValidationDisplay extends React.Component {
-  constructor(props) {
-    super(props);
-  }
 
   renderMessage = (validation) => {
     if (validation.type === "headers") {
