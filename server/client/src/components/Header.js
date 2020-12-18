@@ -16,7 +16,7 @@ const Header = (props) => {
     }
     return(
         <nav className="nav m-4">
-            <img src={bringLogo}/>  
+            <img src={bringLogo} alt="Bring logo"/>  
             {renderContent()}
         </nav>
     );
