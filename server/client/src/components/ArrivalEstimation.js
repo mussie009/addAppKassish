@@ -42,12 +42,9 @@ class ArrivalEstimation extends React.Component {
     readAndParse(file)
       .then((res) => {
         this.setState({ data: res, canEstimate: true, loading: false });
-        console.log("Data", this.state.data);
       })
       .catch((err) => {
         this.setState({ validation: err, loading: false });
-
-        console.log("Errors", this.state.validation);
       });
   }
 
