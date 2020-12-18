@@ -6,6 +6,8 @@ import ValidationDisplay from "./ValidationDisplay";
 import etaService from "../services/eta.service";
 import { readAndParse, writeAndDownload } from "../utils/xlsxHelper";
 import { toInput, toOutput } from "../utils/converter";
+import Instructions from "./Instructions";
+import ServerErrorDisplay from "./ServerErrorDisplay";
 
 class ArrivalEstimation extends React.Component {
   constructor(props) {
@@ -15,6 +17,7 @@ class ArrivalEstimation extends React.Component {
       fileName: "",
       data: [],
       validation: {},
+      serverError: {},
       loading: false,
       canEstimate: false,
     };
@@ -27,7 +30,8 @@ class ArrivalEstimation extends React.Component {
     this.setState({
       data: [],
       validation: {},
-      canEstimate: false
+      serverError: {},
+      canEstimate: false,
     });
   }
 
@@ -58,22 +62,41 @@ class ArrivalEstimation extends React.Component {
         writeAndDownload(output, this.state.fileName);
       })
       .catch((error) => {
-        console.error(error);
+        this.setState({
+          canEstimate: false,
+          serverError: {
+            status: error.response.status,
+            data: error.response.data,
+          },
+        });
+
+        console.log(this.state.serverError);
       });
   }
 
   render() {
     return (
-      <div className="jumbotron jumbotron-fluid bg-color-jt mt-4">
-        <div className="container">
-          <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
-          <p className="lead text-white ">Med fokus på salgsverktøy.</p>
-          <FileSelector selectFile={this.selectFile} />
-          {this.state.loading && <p className="text-white">Validerer {this.state.fileName}...</p>}
-          <ValidationDisplay fileName={this.state.fileName} validation={this.state.validation} />
-          {this.state.loading && <p>Validerer fil...</p>}
-          {this.state.canEstimate && <EstimateButton estimate={this.estimate} />}
+      <div>
+        <div className="jumbotron jumbotron-fluid bg-color-jt mt-4">
+          <div className="container">
+            <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
+            <p className="lead text-white ">Med fokus på salgsverktøy.</p>
+            <FileSelector selectFile={this.selectFile} />
+            {this.state.loading && (
+              <p className="text-white">Validerer {this.state.fileName}...</p>
+            )}
+            <ValidationDisplay
+              fileName={this.state.fileName}
+              validation={this.state.validation}
+            />
+            {this.state.loading && <p>Validerer fil...</p>}
+            {this.state.canEstimate && (
+              <EstimateButton estimate={this.estimate} />
+            )}
+            <ServerErrorDisplay error={this.state.serverError}/>
+          </div>
         </div>
+        <Instructions/>
       </div>
     );
   }
