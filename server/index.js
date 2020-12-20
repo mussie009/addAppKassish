@@ -1,13 +1,20 @@
 const cors = require('cors');
+const mongoose = require('mongoose');
 const express = require('express');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
+const bodyParser = require('body-parser');
 const keys = require('./config/keys');
 
+require('./models/User');
 require('dotenv').config(); // Enables environment variables
 require('./services/passport');
 
+mongoose.connect(keys.MONGODB, {useNewUrlParser: true}).then(() => {console.log("Mongodb connection successfull")});
+
 const app = express();
+
+app.use(bodyParser.urlencoded({ extended : true }));
 
 const corsOptions = {
     origin: "http://localhost:3000"
@@ -15,7 +22,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(cookieSession({
-    maxAge: 60 * 60 * 1000,
+    maxAge: 24 * 60 * 60 * 1000,
     keys: [keys.cookieKey]
 }));
 

@@ -5,11 +5,11 @@ const mongoose = require('mongoose');
 
 const User = mongoose.model('users');
 
-// const myfun = () => {
-//    new User({azureUserId: 'mussie12345678hjkhgjgjhffdfdddd'}).save()
-//    .then(() => console.log('new user in the db'));
-//  }
-//  myfun()
+const myfun = () => {
+   new User({openid: 'psoten dfaksdjfla'}).save()
+   .then(() => console.log('new user in the db'));
+ }
+ myfun()
 
 passport.serializeUser((user, done) => {
     done(null, user.id);
