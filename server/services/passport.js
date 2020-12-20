@@ -1,12 +1,24 @@
 const passport = require('passport');
 const AzureAdStrategy = require('passport-azure-ad').OIDCStrategy;
 const keys = require('../config/keys');
+const mongoose = require('mongoose');
 
+const User = mongoose.model('users');
+
+// const myfun = () => {
+//    new User({azureUserId: 'mussie12345678hjkhgjgjhffdfdddd'}).save()
+//    .then(() => console.log('new user in the db'));
+//  }
+//  myfun()
 
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
-  
+
+passport.deserializeUser((id, done) => {
+  User.findById(id).then((user) => {done(null, user)})
+});
+
 
 passport.use(new AzureAdStrategy({
     identityMetadata: keys.identityMetadata,
