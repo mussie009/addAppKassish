@@ -4,29 +4,9 @@ const keys = require('../config/keys');
 
 
 passport.serializeUser((user, done) => {
-    done(null, user.oid);
+    done(null, user.id);
 });
   
-passport.deserializeUser((oid, done) => {
-    findByOid(oid, (err, user) => {
-      done(err, user);
-    });
-});
-
-// array to hold logged in users
-const users = [];
-
-const findByOid = (oid, fn) => {
-  for (let i = 0, len = users.length; i < len; i++) {
-    let user = users[i];
-   log.info('we are using user: ', user);
-    if (user.oid === oid) {
-      return fn(null, user);
-    }
-  }
-  return fn(null, null);
-};
-
 
 passport.use(new AzureAdStrategy({
     identityMetadata: keys.identityMetadata,
@@ -51,23 +31,15 @@ passport.use(new AzureAdStrategy({
     //clockSkew: keys.clockSkew,
     //proxy: { port: 'proxyport', host: 'proxyhost', protocol: 'http' },
 
-}, (iss, sub, profile, accessToken, refreshToken, done) => {
+}, async (iss, sub, profile, accessToken, refreshToken, done) => {
    // console.log(iss, sub, profile, accessToken, refreshToken);
-    if (!profile.oid) {
-        return done(new Error("No oid found"), null);
-      }
-      process.nextTick(() => {
-        findByOid(profile.oid, (err, user) => {
-          if (err) {
-            return done(err);
-          }
-          if (!user) {
-            // "Auto-registration"
-            users.push(profile);
-            return done(null, profile);
-          }
-          return done(null, user);
-        });
-      });
+    const existingUser = await User.findOne({openid: profile.id});
+
+    if(existingUser){
+      done(null, existingUser);
+    } else {
+      const user = await new User({openid: profile.id}).save()
+      done(null, user);
+    }
 }));
 
