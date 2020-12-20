@@ -5,7 +5,7 @@ class Instructions extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className="m-4">
                 <h1>{instruction.title}</h1>
                 <ul>
                     {instruction.instructions.map((value, index) => {

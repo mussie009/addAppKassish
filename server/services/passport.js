@@ -37,11 +37,11 @@ passport.use(new AzureAdStrategy({
     allowHttpForRedirectUrl: keys.allowHttpForRedirectUrl,
     clientSecret: keys.clientSecret,
     validateIssuer: keys.validateIssuer,
-    isB2C: keys.isB2C,
+    //isB2C: keys.isB2C,
     //issuer: keys.issuer,
     passReqToCallback: keys.passReqToCallback,
-    //scope: keys.scope,
-    //loggingLevel: keys.loggingLevel,
+    scope: keys.scope,
+    loggingLevel: keys.loggingLevel,
     //loggingNoPII: keys.loggingNoPII,
     nonceLifetime: keys.nonceLifetime,
     nonceMaxAmount: keys.nonceMaxAmount,
@@ -53,33 +53,6 @@ passport.use(new AzureAdStrategy({
 
 }, (iss, sub, profile, accessToken, refreshToken, done) => {
    // console.log(iss, sub, profile, accessToken, refreshToken);
-
-
-
-   if ( iss ) {
-    console.log( 'iss' + JSON.stringify( iss ) );
-  }
-
-  if ( sub ) {
-    console.log( 'sub' + JSON.stringify( sub ) );
-  }
-
-  if ( accessToken ) {
-    console.log( 'Received accessToken ' + accessToken );
-  }
-
-  if ( refreshToken ) {
-    console.log( 'Received refreshToken ' + refreshToken );
-  }
-  if ( !profile.oid ) {
-    console.log( 'Received accessToken ' + accessToken );
-    return done( new Error( "No oid found" ), null );
-  }
-
-  if ( profile ) {
-    console.log( 'profile' + JSON.stringify( profile ) );
-  }
-  
     if (!profile.oid) {
         return done(new Error("No oid found"), null);
       }

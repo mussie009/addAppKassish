@@ -46,7 +46,7 @@
 }
 
 .jumbotron {
-  min-height: 650px;
+  min-height: 100px;
 }
 .container {
   padding-top: 130px;
@@ -68,6 +68,28 @@ input[type="file"] {
 .custom-button:hover {
   background-color:	#75b148
 }
+#upload_button {
+  border: 1px solid #7BC144;
+  display: inline-block;
+  padding: 12px 20px 12px 20px;
+  cursor: pointer;
+  border-radius: 3px;
+  background-color: #7BC144;
+  color: #0b0b0b;
+  font-weight: bold;
+  font-size: 20px;
+}
+a:hover {
+  color:#0b0b0b;
+  text-decoration: none;
+}
+.space {
+  display: flex;
+}
+#warning-icon {
+  color: yellow;
+}
+
 @font-face {
   font-family: postenFont;
   src: url('PostenSans-Regular.ttf')  format('truetype');

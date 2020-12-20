@@ -13,11 +13,11 @@ class EstimateButton extends React.Component {
 
   render() {
     return (
-      <div>
-        <button className="custom-button" onClick={this.handleOnClick}>
+      <div className="mt-4">
+        <a className="custom-button" onClick={this.handleOnClick}>
         <i className="fa fa-download mr-3"></i>
           Lastned
-        </button>
+        </a>
       </div>
     );
   }

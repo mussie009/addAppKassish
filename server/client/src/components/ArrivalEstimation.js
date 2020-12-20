@@ -76,7 +76,7 @@ class ArrivalEstimation extends React.Component {
           <div className="container">
             <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
             <p className="lead text-white ">Med fokus på salgsverktøy.</p>
-            <FileSelector selectFile={this.selectFile} />
+            <FileSelector selectFile={this.selectFile} fileName={this.state.fileName}/>
             {this.state.loading && (
               <p className="text-white">Validerer {this.state.fileName}...</p>
             )}

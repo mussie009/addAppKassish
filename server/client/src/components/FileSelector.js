@@ -1,28 +1,38 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import supportedTypes from '../utils/supportedTypes';
 
-class FileSelector extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
+const FileSelector = (props) => {
+
+    const hiddenFileInput = useRef(null);
+  
+    const handleClick = event => {
+        hiddenFileInput.current.click();
     };
 
-    handleChange(e) {
+    const handleChange = (e) =>  {
         const files = e.target.files;
-
-        if (files && files[0]) this.props.selectFile(files[0]);
+         if (files && files[0]) props.selectFile(files[0]);
     };
 
-    render() {
-        return (
-            <div className="mt-5">
-                <label for="file-upload" className="custom-button">
+  
+    return (
+        <div className="mt-5 space">
+            <div>
+                <a className="custom-button" onClick={handleClick}>
                     Velg en fil for å laste opp
-                </label>
-                <input id="file-upload" type="file" accept={supportedTypes} onChange={this.handleChange} />
+                </a>
+                <input 
+                    id="file-upload" 
+                    type="file" 
+                    accept={supportedTypes} 
+                    onChange={handleChange} 
+                    ref={hiddenFileInput}
+                />
             </div>
-        )
-    }
+            <p className="text-white m-2">{props.fileName}</p>
+        </div>
+    );
+  
 }
 
 export default FileSelector;
