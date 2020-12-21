@@ -15,7 +15,8 @@ class ArrivalEstimation extends React.Component {
 
     this.state = {
       fileName: "",
-      data: [],
+      shippings: [],
+      xlsxContent: [],
       validation: {},
       serverError: {},
       loading: false,
@@ -28,7 +29,8 @@ class ArrivalEstimation extends React.Component {
 
   resetState() {
     this.setState({
-      data: [],
+      shippings: [],
+      xlsxContent: [],
       validation: {},
       serverError: {},
       canEstimate: false,
@@ -41,7 +43,12 @@ class ArrivalEstimation extends React.Component {
 
     readAndParse(file)
       .then((res) => {
-        this.setState({ data: res, canEstimate: true, loading: false });
+        this.setState({
+          shippings: res.shippings,
+          xlsxContent: res.content,
+          canEstimate: true,
+          loading: false
+        });
       })
       .catch((err) => {
         this.setState({ validation: err, loading: false });
@@ -49,12 +56,11 @@ class ArrivalEstimation extends React.Component {
   }
 
   estimate() {
-    const input = toInput(this.state.data);
 
     etaService
-      .getEta(input)
-      .then((response) => {
-        const output = toOutput(this.state.data, response.data);
+      .getEta(this.state.shippings)
+      .then((res) => {
+        const output = toOutput(this.state.xlsxContent, res.data);
 
         writeAndDownload(output, this.state.fileName);
       })

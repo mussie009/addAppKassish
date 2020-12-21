@@ -1,6 +1,7 @@
 import XLSX from "xlsx";
 import { validateHeaders, validateData } from './validator';
 import { parseFromISO } from './dateParser';
+const send_date = "2020-11-02";
 
 /**
  * Reads and parses the provided file
@@ -25,31 +26,25 @@ export const readAndParse =  (file) => {
       // Get the first worksheet
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
-  
-      const headers = getHeaders(ws);
 
-      // Returns as error
-      const headerErrors = validateHeaders(headers);
-      if (headerErrors.length !== 0) {
-        reject({
-          type: "headers",
-          data: headerErrors
-        });
-      }
-  
-      const data = XLSX.utils.sheet_to_json(ws, { defval: "" });
+      const shippings = getShippingInfo(ws);
 
-      // Returns as error
-      const dataErrors = validateData(data);
+      const content = XLSX.utils.sheet_to_json(ws, { defval: "" });
+
+      // Returns as error TODO: MÅ FIKSE VALIDERING
+      /* const dataErrors = validateData(shippings);
       if (dataErrors.length !== 0) {
         reject({
           type: "data",
           data: dataErrors
         });
-      }
+      } */
 
       // Returns successfully
-      resolve(data);
+      resolve({
+        content,
+        shippings
+      });
     };
   
     if (rABS) {
@@ -73,24 +68,23 @@ export const writeAndDownload = (data, fileName) => {
     XLSX.writeFile(newBook, getFileName(fileName));
 }
 
-/**
- * Extracts only the headers from the file
- * (to be used for checking if necessary columns are present)
- */
-const getHeaders = (sheet) => {
-  const headers = [];
+const getShippingInfo = (sheet) => {
+  const shippings = [];
   const range = XLSX.utils.decode_range(sheet['!ref']);
-  let C, R = range.s.r;
 
-  for (C = range.s.c; C <= range.e.c; ++C) {
-    const cell = sheet[XLSX.utils.encode_cell({c: C, r: R})];
+  let rowNum;
+  for (rowNum = range.s.r + 1; rowNum <= range.e.r; rowNum++) {
+    const from_cell = sheet[XLSX.utils.encode_cell({r: rowNum, c: 0})];
+    const to_cell = sheet[XLSX.utils.encode_cell({r: rowNum, c: 1 })];
 
-    if (cell && cell.t) {
-      headers.push(XLSX.utils.format_cell(cell));
-    }
+    shippings.push({
+      from_postal_code: XLSX.utils.format_cell(from_cell),
+      to_postal_code: XLSX.utils.format_cell(to_cell),
+      send_date
+    });
   }
-  
-  return headers;
+
+  return shippings;
 }
 
 /**
