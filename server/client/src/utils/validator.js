@@ -10,10 +10,10 @@ export const validateData = (data) => {
 
     data.forEach((item) => {
 
-        if (!isString(item[from_postal_code])) {
+        if (!isValidPostalCode(item[from_postal_code])) {
             from_containsInvalidData = true;
         }
-        if (!isString(item[to_postal_code])) {
+        if (!isValidPostalCode(item[to_postal_code])) {
             to_containsInvalidData = true;
         }
     });
@@ -40,6 +40,7 @@ export const validateHeaders = (headers) => {
     return errors;
 }
 
-const isString = (value) => {
-    return typeof(value) === 'string';
+const isValidPostalCode = (value) => {
+    if (typeof(value) === 'string' && value.length === 4) return true;
+    else return false;
 }
