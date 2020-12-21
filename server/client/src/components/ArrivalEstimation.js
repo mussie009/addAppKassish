@@ -78,13 +78,12 @@ class ArrivalEstimation extends React.Component {
             <p className="lead text-white ">Med fokus på salgsverktøy.</p>
             <FileSelector selectFile={this.selectFile} fileName={this.state.fileName}/>
             {this.state.loading && (
-              <p className="text-white">Validerer {this.state.fileName}...</p>
+              <p className="text-white">Validerer fil...</p>
             )}
             <ValidationDisplay
               fileName={this.state.fileName}
               validation={this.state.validation}
             />
-            {this.state.loading && <p>Validerer fil...</p>}
             {this.state.canEstimate && (
               <EstimateButton estimate={this.estimate} />
             )}

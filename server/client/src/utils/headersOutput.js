@@ -1,6 +1,6 @@
 // Column names for the columns to add to the sheet is modified here
 module.exports = {
-    arrival: "Estimert leveringsdag Prod 1000",
-    window: "Estimert leveringstidsrom prod 1000",
+    arrival: "Estimert levering, antall dager",
+    window: "Estimert leveringstidsrom",
     confidence: "Nøyaktighet"
 }

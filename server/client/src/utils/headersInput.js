@@ -2,5 +2,5 @@
 module.exports = {
     from_postal_code: "Sendt fra postnummer",
     to_postal_code: "Sendt til postnummer",
-    send_date: "Sendingsdato"
+    send_date: "2020-11-02"
 };
