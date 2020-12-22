@@ -1,5 +1,5 @@
 import React from "react";
-import '../App.css';
+import "../App.css";
 
 class EstimateButton extends React.Component {
   constructor(props) {
@@ -13,10 +13,10 @@ class EstimateButton extends React.Component {
 
   render() {
     return (
-      <div className="mt-4">
+      <div>
         <a className="custom-button" onClick={this.handleOnClick}>
-        <i className="fa fa-download mr-3"></i>
-          Lastned
+          <i className="fa fa-download mr-3"></i>
+          Last ned
         </a>
       </div>
     );
