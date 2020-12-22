@@ -1,18 +1,5 @@
-import { from_postal_code, to_postal_code, send_date } from "./headersInput";
+import { send_date } from '../utils/xlsxHelper';
 import { arrival, window, confidence } from "./headersOutput";
-
-/**
- * Extracts the mandatory columns from the provided data
- */
-export const toInput = (data) => {
-  return data.map((row) => {
-    return {
-      from_postal_code: row[from_postal_code],
-      to_postal_code: row[to_postal_code],
-      send_date
-    };
-  });
-};
 
 /**
  * Inserts the new data (estimation data) into the existing data

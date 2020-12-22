@@ -1,13 +1,13 @@
 import React from "react";
 import "../App.css";
-import EstimateButton from "./EstimateButton";
 import FileSelector from "./FileSelector";
-import ValidationDisplay from "./ValidationDisplay";
+import InvalidRows from "./InvalidRows";
+import EstimateButton from "./EstimateButton";
+import ServerErrors from "./ServerErrors";
+import XlsxSetup from "./XlsxSetup";
 import etaService from "../services/eta.service";
 import { readAndParse, writeAndDownload } from "../utils/xlsxHelper";
-import { toInput, toOutput } from "../utils/converter";
-import Instructions from "./Instructions";
-import ServerErrorDisplay from "./ServerErrorDisplay";
+import { toOutput } from "../utils/converter";
 
 class ArrivalEstimation extends React.Component {
   constructor(props) {
@@ -15,10 +15,10 @@ class ArrivalEstimation extends React.Component {
 
     this.state = {
       fileName: "",
-      shippings: [],
+      deliveries: [],
       xlsxContent: [],
-      validation: {},
-      serverError: {},
+      invalidRows: [],
+      serverErrors: [],
       loading: false,
       canEstimate: false,
     };
@@ -29,36 +29,40 @@ class ArrivalEstimation extends React.Component {
 
   resetState() {
     this.setState({
-      shippings: [],
+      deliveries: [],
       xlsxContent: [],
-      validation: {},
-      serverError: {},
+      invalidRows: [],
+      serverErrors: [],
+      loading: false,
       canEstimate: false,
     });
   }
 
   selectFile(file) {
     this.resetState();
+
     this.setState({ loading: true, fileName: file.name });
 
     readAndParse(file)
       .then((res) => {
         this.setState({
-          shippings: res.shippings,
-          xlsxContent: res.content,
+          deliveries: res.deliveries,
+          xlsxContent: res.xlsxContent,
+          loading: false,
           canEstimate: true,
-          loading: false
         });
       })
       .catch((err) => {
-        this.setState({ validation: err, loading: false });
+        this.setState({
+          invalidRows: err,
+          loading: false,
+        });
       });
   }
 
   estimate() {
-
     etaService
-      .getEta(this.state.shippings)
+      .getEta(this.state.deliveries)
       .then((res) => {
         const output = toOutput(this.state.xlsxContent, res.data);
 
@@ -67,10 +71,7 @@ class ArrivalEstimation extends React.Component {
       .catch((error) => {
         this.setState({
           canEstimate: false,
-          serverError: {
-            status: error.response.status,
-            data: error.response.data,
-          },
+          serverErrors: error.response.data.errors,
         });
       });
   }
@@ -82,21 +83,21 @@ class ArrivalEstimation extends React.Component {
           <div className="container">
             <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
             <p className="lead text-white ">Med fokus på salgsverktøy.</p>
-            <FileSelector selectFile={this.selectFile} fileName={this.state.fileName}/>
+            <FileSelector
+              selectFile={this.selectFile}
+              fileName={this.state.fileName}
+            />
             {this.state.loading && (
               <p className="text-white">Validerer fil...</p>
             )}
-            <ValidationDisplay
-              fileName={this.state.fileName}
-              validation={this.state.validation}
-            />
+            <InvalidRows rows={this.state.invalidRows} />
             {this.state.canEstimate && (
               <EstimateButton estimate={this.estimate} />
             )}
-            <ServerErrorDisplay error={this.state.serverError}/>
+            <ServerErrors errors={this.state.serverErrors} />
           </div>
         </div>
-        <Instructions/>
+        <XlsxSetup />
       </div>
     );
   }
