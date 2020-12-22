@@ -1,13 +1,13 @@
 import React from "react";
 import "../App.css";
-import EstimateButton from "./EstimateButton";
 import FileSelector from "./FileSelector";
-import ValidationDisplay from "./ValidationDisplay";
+import InvalidRows from "./InvalidRows";
+import EstimateButton from "./EstimateButton";
+import ServerErrors from "./ServerErrors";
+import XlsxSetup from "./XlsxSetup";
 import etaService from "../services/eta.service";
 import { readAndParse, writeAndDownload } from "../utils/xlsxHelper";
-import { toInput, toOutput } from "../utils/converter";
-import Instructions from "./Instructions";
-import ServerErrorDisplay from "./ServerErrorDisplay";
+import { toOutput } from "../utils/converter";
 
 class ArrivalEstimation extends React.Component {
   constructor(props) {
@@ -15,10 +15,12 @@ class ArrivalEstimation extends React.Component {
 
     this.state = {
       fileName: "",
-      data: [],
-      validation: {},
-      serverError: {},
-      loading: false,
+      deliveries: [],
+      xlsxContent: [],
+      invalidRows: [],
+      serverErrors: [],
+      validating: false,
+      estimating: false,
       canEstimate: false,
     };
 
@@ -28,45 +30,75 @@ class ArrivalEstimation extends React.Component {
 
   resetState() {
     this.setState({
-      data: [],
-      validation: {},
-      serverError: {},
+      deliveries: [],
+      xlsxContent: [],
+      invalidRows: [],
+      serverErrors: [],
+      validating: false,
+      estimating: false,
       canEstimate: false,
     });
   }
 
   selectFile(file) {
     this.resetState();
-    this.setState({ loading: true, fileName: file.name });
+
+    this.setState({ validating: true, fileName: file.name });
 
     readAndParse(file)
       .then((res) => {
-        this.setState({ data: res, canEstimate: true, loading: false });
+        this.setState({
+          deliveries: res.deliveries,
+          xlsxContent: res.xlsxContent,
+          validating: false,
+          canEstimate: true,
+        });
       })
       .catch((err) => {
-        this.setState({ validation: err, loading: false });
+        this.setState({
+          invalidRows: err,
+          validating: false,
+        });
       });
   }
 
   estimate() {
-    const input = toInput(this.state.data);
+    this.setState({ estimating: true });
 
     etaService
-      .getEta(input)
-      .then((response) => {
-        const output = toOutput(this.state.data, response.data);
+      .getEta(this.state.deliveries)
+      .then((res) => {
+        const output = toOutput(this.state.xlsxContent, res.data);
 
         writeAndDownload(output, this.state.fileName);
+
+        this.setState({ estimating: false });
       })
       .catch((error) => {
         this.setState({
+          estimating: false,
           canEstimate: false,
-          serverError: {
-            status: error.response.status,
-            data: error.response.data,
-          },
+          serverErrors: error.response.data.errors,
         });
       });
+  }
+
+  feedback() {
+    if (this.state.validating) {
+      return (
+        <p className="text-white">
+          <i id="warning-icon" className="fa fa-spinner fa-pulse m-2"></i>
+          Validerer...
+        </p>
+      );
+    } else if (this.state.canEstimate) {
+      return (
+        <p className="text-white">
+          <i id="valid-icon" className="fa fa-check m-2"></i>
+          Gyldig
+        </p>
+      );
+    } else return null;
   }
 
   render() {
@@ -75,23 +107,26 @@ class ArrivalEstimation extends React.Component {
         <div className="jumbotron jumbotron-fluid bg-color-jt mt-4">
           <div className="container">
             <h1 className="display-4 text-white">ETA for Bedriftspakker</h1>
-            <p className="lead text-white ">Med fokus på salgsverktøy.</p>
-            <FileSelector selectFile={this.selectFile} fileName={this.state.fileName}/>
-            {this.state.loading && (
-              <p className="text-white">Validerer {this.state.fileName}...</p>
-            )}
-            <ValidationDisplay
+            <p className="lead text-white">Med fokus på salgsverktøy.</p>
+            <FileSelector
+              selectFile={this.selectFile}
               fileName={this.state.fileName}
-              validation={this.state.validation}
             />
-            {this.state.loading && <p>Validerer fil...</p>}
-            {this.state.canEstimate && (
+            {this.feedback()}
+            <InvalidRows rows={this.state.invalidRows} />
+            <ServerErrors errors={this.state.serverErrors} />
+            {this.state.estimating && (
+              <p className="text-white">
+                <i id="warning-icon" className="fa fa-spinner fa-pulse m-2"></i>
+                Laster ned...
+              </p>
+            )}
+            {this.state.canEstimate && !this.state.estimating && (
               <EstimateButton estimate={this.estimate} />
             )}
-            <ServerErrorDisplay error={this.state.serverError}/>
           </div>
         </div>
-        <Instructions/>
+        <XlsxSetup />
       </div>
     );
   }
