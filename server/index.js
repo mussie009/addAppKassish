@@ -1,7 +1,10 @@
+
 const cors = require('cors');
 const mongoose = require('mongoose');
 const express = require('express');
 const cookieSession = require('cookie-session');
+const cookieParser = require('cookie-parser');
+
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const keys = require('./config/keys');
@@ -14,6 +17,7 @@ mongoose.connect(keys.MONGODB, {useNewUrlParser: true}).then(() => {console.log(
 
 const app = express();
 
+
 app.use(bodyParser.urlencoded({ extended : true }));
 
 const corsOptions = {
@@ -21,6 +25,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+app.use(cookieParser());
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
     keys: [keys.cookieKey]

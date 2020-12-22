@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import {BrowserRouter, Route} from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
+import Landing from './components/Landing';
+
 
 
 // Components
 import ArrivalEstimation from './components/ArrivalEstimation';
-
+import { isValidObjectId } from 'mongoose';
+const LandingComponent = () => <h2>Landing component</h2>
 const App = () => {
 
   const [user, setUser] = useState([]);
@@ -25,10 +29,13 @@ const App = () => {
   }, []);
 
   return (
-    <div className="container-fluid">
-      <Header user={user}/>
-      <ArrivalEstimation />
-    </div>
+    <BrowserRouter>
+      <div className="container-fluid">
+        <Header user={user}/>
+        <Route path='/' exact={true} component={Landing}/>
+        <Route path='/estimer' exact={true} component={ArrivalEstimation}/>
+      </div>
+    </BrowserRouter>
   );
 }
 
