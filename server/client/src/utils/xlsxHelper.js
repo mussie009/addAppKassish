@@ -1,57 +1,45 @@
 import XLSX from "xlsx";
-import { validateHeaders, validateData } from './validator';
-import { parseFromISO } from './dateParser';
+import { isValidPostalCode } from "./validator";
+import { parseFromISO } from "./dateParser";
+
+export const send_date = "2020-11-02";
 
 /**
  * Reads and parses the provided file
  */
-export const readAndParse =  (file) => {
-
+export const readAndParse = (file) => {
   // Using promise because headers and data array is not populating synchronizable
   return new Promise((resolve, reject) => {
-  
     const reader = new FileReader();
     const rABS = !!reader.readAsBinaryString;
-  
+
     reader.onload = (e) => {
       // Parse data
       const bstr = e.target.result;
-  
+
       const wb = XLSX.read(bstr, {
         type: rABS ? "binary" : "array",
         cellDates: true,
       });
-  
+
       // Get the first worksheet
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
-  
-      const headers = getHeaders(ws);
 
-      // Returns as error
-      const headerErrors = validateHeaders(headers);
-      if (headerErrors.length !== 0) {
-        reject({
-          type: "headers",
-          data: headerErrors
-        });
-      }
-  
-      const data = XLSX.utils.sheet_to_json(ws, { defval: "" });
+      const { deliveries, invalidRows } = getDeliveryInfo(ws);
 
-      // Returns as error
-      const dataErrors = validateData(data);
-      if (dataErrors.length !== 0) {
-        reject({
-          type: "data",
-          data: dataErrors
-        });
+      if (invalidRows.length !== 0) {
+        reject(invalidRows);
       }
 
-      // Returns successfully
-      resolve(data);
+      const xlsxContent = XLSX.utils.sheet_to_json(ws, { defval: "" });
+
+      resolve({
+        xlsxContent,
+        deliveries,
+      });
     };
-  
+
     if (rABS) {
       reader.readAsBinaryString(file);
     } else {
@@ -64,34 +52,49 @@ export const readAndParse =  (file) => {
  * Writes the old and new data to a new xlsx-file
  */
 export const writeAndDownload = (data, fileName) => {
-    const newBook = XLSX.utils.book_new();
-    const newSheet = XLSX.utils.json_to_sheet(data, { cellDates: true, dateNF: "dd.MM.yyyy" });
+  const newBook = XLSX.utils.book_new();
+  const newSheet = XLSX.utils.json_to_sheet(data, {
+    cellDates: true,
+    dateNF: "dd.MM.yyyy",
+  });
 
-    XLSX.utils.book_append_sheet(newBook, newSheet, "Estimater");
+  XLSX.utils.book_append_sheet(newBook, newSheet, "Estimater");
 
-    // Writing the file will cause an automatic download
-    XLSX.writeFile(newBook, getFileName(fileName));
-}
+  // Writing the file will cause an automatic download
+  XLSX.writeFile(newBook, getFileName(fileName));
+};
 
 /**
- * Extracts only the headers from the file
- * (to be used for checking if necessary columns are present)
+ * Extracts from and to postal codes from the two first columns
  */
-const getHeaders = (sheet) => {
-  const headers = [];
-  const range = XLSX.utils.decode_range(sheet['!ref']);
-  let C, R = range.s.r;
+const getDeliveryInfo = (sheet) => {
+  const deliveries = [];
+  const invalidRows = [];
+  const range = XLSX.utils.decode_range(sheet["!ref"]);
 
-  for (C = range.s.c; C <= range.e.c; ++C) {
-    const cell = sheet[XLSX.utils.encode_cell({c: C, r: R})];
+  let rowNum;
+  for (rowNum = range.s.r + 1; rowNum <= range.e.r; rowNum++) {
+    const from_cell = sheet[XLSX.utils.encode_cell({ r: rowNum, c: 0 })];
+    const to_cell = sheet[XLSX.utils.encode_cell({ r: rowNum, c: 1 })];
 
-    if (cell && cell.t) {
-      headers.push(XLSX.utils.format_cell(cell));
+    if (!from_cell || !to_cell) {
+      invalidRows.push(rowNum + 1)
+    } else if (!isValidPostalCode(from_cell.v) || !isValidPostalCode(to_cell.v)) {
+      invalidRows.push(rowNum + 1);
     }
+
+    deliveries.push({
+      from_postal_code: XLSX.utils.format_cell(from_cell),
+      to_postal_code: XLSX.utils.format_cell(to_cell),
+      send_date,
+    });
   }
-  
-  return headers;
-}
+
+  return {
+    deliveries,
+    invalidRows
+  }
+};
 
 /**
  * Creates a new recognizable name

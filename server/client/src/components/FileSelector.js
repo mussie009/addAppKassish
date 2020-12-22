@@ -29,7 +29,7 @@ const FileSelector = (props) => {
                     ref={hiddenFileInput}
                 />
             </div>
-            <p className="text-white m-2">{props.fileName}</p>
+            <p className="text-white m-3">{props.fileName}</p>
         </div>
     );
   
