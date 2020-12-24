@@ -4,6 +4,7 @@ import bringLogo from '../bringLogo.png'
 const Header = ({ user }) => {
 
     const renderContent = () => {
+    
           if(!user){
             return (<a className="nav-link ml-auto App-link "href="/auth/openid">Logg inn<i className="fa fa-user ml-3"></i></a>);
           } else {

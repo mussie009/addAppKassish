@@ -13,6 +13,6 @@ const checkAuthentication = (req, res, next) => {
 }
 
 module.exports = (app) => {
-  app.post("/estimate", checkAuthentication, controller.estimate);
+  app.post("/estimer", controller.estimate);
 };
 

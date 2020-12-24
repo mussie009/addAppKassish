@@ -1,6 +1,7 @@
 import React from 'react';
 
 const Landing = () => {
+ 
     return (
         <div>
           <div className="jumbotron jumbotron-fluid bg-color-jt mt-4">
@@ -13,6 +14,7 @@ const Landing = () => {
           </div>
         </div>
       );
+   
 }
 
 export default Landing;
