@@ -5,12 +5,6 @@ const mongoose = require('mongoose');
 
 const User = mongoose.model('users');
 
-// const myfun = () => {
-//    new User({openid: 'psoten dfaksdjfla'}).save()
-//    .then(() => console.log('new user in the db'));
-//  }
-//  myfun()
-
 passport.serializeUser((user, done) => {
   console.log("from serialize, user: ", user);
     done(null, user.id);
