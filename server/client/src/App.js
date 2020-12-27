@@ -4,13 +4,8 @@ import {BrowserRouter, Route} from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
 import Landing from './components/Landing';
-
-
-
-// Components
 import ArrivalEstimation from './components/ArrivalEstimation';
-import { isValidObjectId } from 'mongoose';
-const LandingComponent = () => <h2>Landing component</h2>
+
 const App = () => {
 
   const [user, setUser] = useState([]);
@@ -18,7 +13,7 @@ const App = () => {
   const fetchUser = async () => {
     try {
         const response = await axios.get('/api/current_user');
-        setUser(response.data)
+        setUser(response.data || false)
     } catch (e) {
         console.log("Error in fetching the user...: ", e);
     }
@@ -33,7 +28,7 @@ const App = () => {
       <div className="container-fluid">
         <Header user={user}/>
         <Route path='/' exact={true} component={Landing}/>
-        <Route path='/estimer' exact={true} component={ArrivalEstimation}/>
+        <Route path='/estimer' component={ArrivalEstimation}/>
       </div>
     </BrowserRouter>
   );

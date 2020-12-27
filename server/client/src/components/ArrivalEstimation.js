@@ -1,11 +1,11 @@
 import React from "react";
+import axios from 'axios';
 import "../App.css";
 import FileSelector from "./FileSelector";
 import InvalidRows from "./InvalidRows";
 import EstimateButton from "./EstimateButton";
 import ServerErrors from "./ServerErrors";
 import XlsxSetup from "./XlsxSetup";
-import etaService from "../services/eta.service";
 import { readAndParse, writeAndDownload } from "../utils/xlsxHelper";
 import { toOutput } from "../utils/converter";
 
@@ -27,6 +27,9 @@ class ArrivalEstimation extends React.Component {
     this.selectFile = this.selectFile.bind(this);
     this.estimate = this.estimate.bind(this);
   }
+  getEta(data){
+    return axios.post('/api/estimer', { data: data });
+  };
 
   resetState() {
     this.setState({
@@ -65,8 +68,8 @@ class ArrivalEstimation extends React.Component {
   estimate() {
     this.setState({ estimating: true });
 
-    etaService
-      .getEta(this.state.deliveries)
+    
+      this.getEta(this.state.deliveries)
       .then((res) => {
         const output = toOutput(this.state.xlsxContent, res.data);
 

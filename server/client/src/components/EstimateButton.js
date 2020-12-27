@@ -1,6 +1,7 @@
 import React from "react";
 import "../App.css";
 
+
 class EstimateButton extends React.Component {
   constructor(props) {
     super(props);
@@ -14,10 +15,10 @@ class EstimateButton extends React.Component {
   render() {
     return (
       <div>
-        <a className="custom-button" onClick={this.handleOnClick}>
+        <button className="custom-button" onClick={this.handleOnClick}>
           <i className="fa fa-download mr-3"></i>
           Last ned
-        </a>
+        </button>
       </div>
     );
   }

@@ -18,9 +18,9 @@ const FileSelector = (props) => {
     return (
         <div className="mt-5 space">
             <div>
-                <a className="custom-button" onClick={handleClick}>
+                <button className="custom-button" onClick={handleClick}>
                     Velg en fil for å laste opp
-                </a>
+                </button>
                 <input 
                     id="file-upload" 
                     type="file" 
