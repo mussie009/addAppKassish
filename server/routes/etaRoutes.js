@@ -12,7 +12,14 @@ const checkAuthentication = (req, res, next) => {
   }
 }
 
+const ensureAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated())
+    return next();
+  else
+  res.redirect('/')
+};
+
 module.exports = (app) => {
-  app.post("/api/estimer", controller.estimate);
+  app.post("/api/estimer", ensureAuthenticated, controller.estimate);
 };
 

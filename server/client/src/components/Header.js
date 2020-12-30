@@ -2,10 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import bringLogo from '../bringLogo.png'
 
-const Header = ({ user }) => {
+const Header = ({ isAuthenticated }) => {
 
     const renderContent = () => {
-          switch(user){
+          switch(isAuthenticated){
             case null:
               return;
             case false:
@@ -17,7 +17,7 @@ const Header = ({ user }) => {
 
     return(
         <nav className="nav m-4">
-            <Link to={user ? '/estimer': '/'}><img src={bringLogo} alt="Bring logo"/></Link> 
+           <img src={bringLogo} alt="Bring logo"/>
             {renderContent()}
         </nav>
     );
