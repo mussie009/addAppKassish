@@ -23,6 +23,12 @@ module.exports = {
     //this key is associated with the cookie-session package and not Azure
     cookieKey: process.env.COOKIE_KEY,
 
+    //Postens API URL
+    apiUrl: process.env.API_URL, 
+
+    //Postens bearer token
+    bearerToken: process.env.BEARER_TOKEN,
+
     // mongobd connection string
     MONGODB: process.env.MONGODB,
 

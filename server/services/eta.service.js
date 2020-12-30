@@ -1,13 +1,12 @@
 const axios = require('axios');
-const { API_URL, BEARER_TOKEN } = require('../config/posten');
-
+const keys = require('../config/keys');
 /**
  * Retrieves estimation data from the Posten API
  */
-const getEta = async (data) => {
-    return await axios.post(API_URL, { data: data }, {
+const getEta = (data) => {
+    return axios.post(keys.apiUrl, { data: data }, {
         headers: {
-            'Authorization': `Bearer ${BEARER_TOKEN}`,
+            'Authorization': `Bearer ${keys.bearerToken}`,
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
