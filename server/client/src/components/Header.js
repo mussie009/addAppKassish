@@ -17,7 +17,7 @@ const Header = ({ isAuthenticated }) => {
 
     return(
         <nav className="nav m-4">
-           <img src={bringLogo} alt="Bring logo"/>
+           <Link to={isAuthenticated ? '/estimer' : '/'}><img src={bringLogo} alt="Bring logo"/></Link> 
             {renderContent()}
         </nav>
     );
