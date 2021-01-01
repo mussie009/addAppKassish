@@ -32,4 +32,4 @@ jobs:
         app-name: 'eta-posten-bring'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_3df54beefafb4d1495aa9d98f5a78bb3 }}
-        package: ./eta-posten
+        package: ./server
