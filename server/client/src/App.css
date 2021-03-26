@@ -96,7 +96,3 @@ a:hover {
   color: #7BC144;
 }
 
-@font-face {
-  font-family: postenFont;
-  src: url('PostenSans-Regular.ttf')  format('truetype');
-}
